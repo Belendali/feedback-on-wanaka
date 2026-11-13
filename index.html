@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}</style>
+</head>
+<body>
+<title>Feedback on Wanaka</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one issue per band — title, two recordings side by side (Wanaka left / other product right), one-line target. */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --fg: #16181d;
+  --muted: #5d6370;
+  --line: #e1e4ea;
+  --screen: #0d0f13;
+  --bad: #d9480f;
+  --bad-soft: #fff0e8;
+  --good: #0b8a63;
+  --good-soft: #e6f6f0;
+  --goal: #3b5bdb;
+  --goal-soft: #edf1ff;
+  --scrim: rgba(8, 9, 12, .88);
+  --display: "Space Grotesk", "Noto Sans SC", system-ui, sans-serif;
+  --body: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317; --surface: #1a1d23; --fg: #eceef2; --muted: #9aa1ae; --line: #2a2e36; --screen: #050608;
+    --bad: #ff8a50; --bad-soft: #2d1b12; --good: #3ccf9a; --good-soft: #10261e; --goal: #8ea4ff; --goal-soft: #171d33;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111317; --surface: #1a1d23; --fg: #eceef2; --muted: #9aa1ae; --line: #2a2e36; --screen: #050608;
+  --bad: #ff8a50; --bad-soft: #2d1b12; --good: #3ccf9a; --good-soft: #10261e; --goal: #8ea4ff; --goal-soft: #171d33;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 80px;
+}
+.wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 56px; }
+h1 { font-family: var(--display); font-size: clamp(28px, 4vw, 40px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.top { display: grid; gap: 6px; }
+.date { font-family: var(--display); font-size: 13px; letter-spacing: .06em; color: var(--muted); }
+
+section.issue { display: grid; gap: 16px; }
+h2 { font-family: var(--display); font-size: 24px; margin: 0; }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pair.solo { grid-template-columns: minmax(0, 860px); }
+.side { display: grid; grid-template-rows: auto auto 1fr; gap: 10px; min-width: 0; }
+.chip {
+  justify-self: start; font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 4px;
+}
+.side.us .chip { background: var(--bad-soft); color: var(--bad); }
+.side.them .chip { background: var(--good-soft); color: var(--good); }
+
+.screen {
+  position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: var(--screen); border-radius: 10px;
+  overflow: hidden; border: 1px solid var(--line); padding: 0; cursor: zoom-in; display: block; width: 100%;
+}
+.side.us .screen { box-shadow: inset 0 0 0 2px var(--bad); }
+.screen video, .screen img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+.screen .zoom {
+  position: absolute; right: 10px; bottom: 10px; font-size: 12px; color: #fff; background: rgba(0,0,0,.6);
+  padding: 4px 10px; border-radius: 999px; opacity: .85; transition: opacity .15s;
+}
+.screen:hover .zoom, .screen:focus-visible .zoom { opacity: 1; }
+.screen:focus-visible { outline: 2px solid var(--goal); outline-offset: 2px; }
+.missing {
+  aspect-ratio: 16 / 9; max-width: 100%; border: 1.5px dashed var(--line); border-radius: 10px;
+  display: grid; place-items: center; color: var(--muted); font-size: 14px; padding: 16px;
+}
+.say { margin: 0; font-size: 15px; }
+
+.goal { background: var(--goal-soft); border-radius: 10px; padding: 12px 16px; display: flex; gap: 12px; align-items: baseline; }
+.goal .chip { background: var(--goal); color: var(--surface); flex: none; }
+.goal p { margin: 0; }
+
+/* Lightbox */
+dialog.lb {
+  width: min(96vw, 1600px); max-width: 96vw; max-height: 94vh; padding: 0; border: 0; background: transparent;
+  overflow: visible;
+}
+dialog.lb::backdrop { background: var(--scrim); }
+dialog.lb video, dialog.lb img { width: 100%; max-height: 88vh; object-fit: contain; display: block; background: #000; border-radius: 10px; }
+dialog.lb .close {
+  position: absolute; top: -44px; right: 0; font: inherit; font-size: 14px; color: #fff; background: rgba(255,255,255,.14);
+  border: 0; border-radius: 999px; padding: 6px 14px; cursor: pointer;
+}
+dialog.lb .close:focus-visible { outline: 2px solid #fff; }
+
+@media (max-width: 760px) {
+  body { padding-block: 24px 56px; }
+  .wrap { gap: 44px; }
+  .pair { grid-template-columns: 1fr; }
+  dialog.lb .close { top: auto; bottom: -46px; }
+}
+
+/* Demo link — last band */
+.demo-band { border-top: 1px solid var(--line); padding-top: 40px; }
+.demo {
+  display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px;
+}
+.demo .thumb { display: block; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 16 / 9; background: var(--screen); }
+.demo .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.demo .copy { display: grid; gap: 12px; justify-items: start; padding: 4px 8px; }
+.demo .copy p { margin: 0; color: var(--muted); }
+.demo ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+.demo .open {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 700;
+  background: var(--goal); color: var(--surface); padding: 10px 18px; border-radius: 999px;
+}
+.demo .open:hover { filter: brightness(1.08); }
+.demo .open:focus-visible { outline: 2px solid var(--goal); outline-offset: 3px; }
+.demo .url { font-size: 12px; color: var(--muted); }
+@media (max-width: 760px) { .demo { grid-template-columns: 1fr; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Feedback on Wanaka</h1>
+    <time class="date" datetime="2026-11">November 2026</time>
+  </header>
+
+  <section class="issue" id="add-assets">
+    <h2>添加素材</h2>
+    <div class="pair">
+      <div class="side us">
+        <span class="chip">Wanaka</span>
+        <button class="screen" type="button" aria-label="放大 Wanaka 添加素材录屏"><video src="media/assets-wanaka.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">点了 + 场景里什么都没出现，不知道素材去哪了。</p>
+      </div>
+      <div class="side them">
+        <span class="chip">Spline</span>
+        <button class="screen" type="button" aria-label="放大 Spline 添加素材录屏"><video src="media/assets-spline.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">选了就直接出现在场景里，自动选中，马上能拖。</p>
+      </div>
+    </div>
+    <div class="goal"><span class="chip">目标</span><p>点 + 后，素材直接出现在视口中心并选中，可以马上拖动摆放。</p></div>
+  </section>
+
+  <section class="issue" id="character">
+    <h2>创建角色</h2>
+    <div class="pair">
+      <div class="side us">
+        <span class="chip">Wanaka</span>
+        <button class="screen" type="button" aria-label="放大 Wanaka 创建角色录屏"><video src="media/character-wanaka.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">上传图片后只进了项目素材，没法用图片生成角色。</p>
+      </div>
+      <div class="side them">
+        <span class="chip">Spline</span>
+        <button class="screen" type="button" aria-label="放大 Spline 创建角色录屏"><video src="media/character-other.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">贴一张图，说“照这个做一个 3D 角色”就开始生成。</p>
+      </div>
+    </div>
+    <div class="goal"><span class="chip">目标</span><p>支持上传参考图生成角色，拖图进来就能开始。</p></div>
+  </section>
+
+  <section class="issue" id="edit-assets">
+    <h2>编辑素材</h2>
+    <div class="pair">
+      <div class="side us">
+        <span class="chip">Wanaka</span>
+        <button class="screen" type="button" aria-label="放大 Wanaka 编辑素材录屏"><video src="media/edit-wanaka.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">选中物体会铺满蓝色网格线，不够美观，也有点多余。</p>
+      </div>
+      <div class="side them">
+        <span class="chip">Spline</span>
+        <button class="screen" type="button" aria-label="放大 Spline 编辑素材录屏"><video src="media/edit-spline.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">选中只出现一个干净的外框，一眼看清选了什么。</p>
+      </div>
+    </div>
+    <div class="goal"><span class="chip">目标</span><p>选中时只显示外框，去掉网格线。</p></div>
+  </section>
+
+  <section class="issue" id="upload">
+    <h2>上传资源</h2>
+    <div class="pair">
+      <div class="side us">
+        <span class="chip">Wanaka</span>
+        <button class="screen" type="button" aria-label="放大 Wanaka 上传资源录屏"><video src="media/upload-wanaka.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">一次只能选一个文件，也不支持拖进对话框。</p>
+      </div>
+      <div class="side them">
+        <span class="chip">Combos</span>
+        <button class="screen" type="button" aria-label="放大 Combos 上传资源录屏"><video src="media/upload-comfy.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">多个图片、视频直接拖进对话框就行。</p>
+      </div>
+    </div>
+    <div class="goal"><span class="chip">目标</span><p>支持多选和拖拽上传，比如「第一张图生成场景，第二张图生成玩家」。</p></div>
+  </section>
+
+  <section class="issue" id="preview">
+    <h2>预览</h2>
+    <div class="pair">
+      <div class="side us">
+        <span class="chip">Wanaka</span>
+        <button class="screen" type="button" aria-label="放大 Wanaka 预览截图"><img src="media/preview-wanaka.jpg" alt="Wanaka 编辑器，只有 PC 端预览"><span class="zoom">点击放大</span></button>
+        <p class="say">只能看 PC 端，看不到手机上是什么样子。</p>
+      </div>
+      <div class="side them">
+        <span class="chip">Combos</span>
+        <button class="screen" type="button" aria-label="放大 Combos 预览截图"><img src="media/preview-combos.jpg" alt="Combos 预览，顶部可切换手机、平板、电脑"><span class="zoom">点击放大</span></button>
+        <p class="say">顶部一键切换手机、平板、电脑预览。</p>
+      </div>
+    </div>
+    <div class="goal"><span class="chip">目标</span><p>预览里加设备切换，能直接看手机端效果。</p></div>
+  </section>
+
+  <section class="issue" id="back-home">
+    <h2>返回首页</h2>
+    <div class="pair">
+      <div class="side us">
+        <span class="chip">Wanaka</span>
+        <button class="screen" type="button" aria-label="放大 Wanaka 返回首页录屏"><video src="media/back-wanaka.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">玩完关闭后跳到一个游戏列表页，和首页不太连贯，容易以为跳错了、找不到怎么回去。</p>
+      </div>
+      <div class="side them">
+        <span class="chip">Combos</span>
+        <button class="screen" type="button" aria-label="放大 Combos 返回首页录屏"><video src="media/back-combos-2.mp4" muted loop playsinline autoplay preload="metadata"></video><span class="zoom">点击放大</span></button>
+        <p class="say">关闭后进 Discover 页，左上角有明显的返回按钮，一点就回首页。</p>
+      </div>
+    </div>
+    <div class="goal"><span class="chip">目标</span><p>方案 1：关闭游戏后直接回到首页。<br>方案 2：像 Combos 一样进二级页，并给一个明显的返回首页按钮。</p></div>
+  </section>
+
+  <section class="issue" id="pick-models">
+    <h2>选择模型</h2>
+    <div class="pair solo">
+      <div class="side us">
+        <span class="chip">Wanaka</span>
+        <button class="screen" type="button" aria-label="放大 Wanaka 选择模型截图"><img src="media/pick-models-wanaka.jpg" alt="Wanaka 计划页的 Assets 步骤，5 个物品要逐个从几十个模型里选"><span class="zoom">点击放大</span></button>
+        <p class="say">开始做之前要给每个物品手动选模型，这里 5 个物品、每个几十个可选，很容易卡在这一步。</p>
+      </div>
+    </div>
+    <div class="goal"><span class="chip">目标</span><p>默认开启自动选择，AI 先选好直接开始做，不喜欢再换。</p></div>
+  </section>
+
+  <section class="issue demo-band" id="demo">
+    <h2>编辑器右侧面板 · 可交互 Demo</h2>
+    <div class="demo">
+      <a class="thumb" href="https://belendali.github.io/wanaka-right-panel-demo/" target="_blank" rel="noopener"><img src="media/demo-cover.jpg" alt="Wanaka Studio 编辑器右侧面板 Tools 页截图" loading="lazy"></a>
+      <div class="copy">
+        <p>基于 Figma 1112 的设计稿，可以直接点：</p>
+        <ul>
+          <li>Chat / Scene / Adjust / Tools 四个 tab</li>
+          <li>Tools 里每个工具的二级页，Use in Chat 带入对话</li>
+          <li>Create Game 引导 → 发送 → Game Plan</li>
+          <li>Create My Wana、场景和物体右键菜单</li>
+        </ul>
+        <a class="open" href="https://belendali.github.io/wanaka-right-panel-demo/" target="_blank" rel="noopener">打开 Demo ↗</a>
+        <span class="url">左下角 Screens 可以跳到任意一屏，按 H 显示可点区域</span>
+      </div>
+    </div>
+  </section>
+
+
+</div>
+
+<dialog class="lb" id="lb" aria-label="放大的录屏">
+  <button class="close" type="button" id="lb-close">关闭 ✕</button>
+  <video id="lb-video" controls playsinline loop muted></video>
+  <img id="lb-img" alt="" hidden>
+</dialog>
+
+<script>
+  const lb = document.getElementById('lb');
+  const lbVideo = document.getElementById('lb-video');
+  const lbImg = document.getElementById('lb-img');
+  document.querySelectorAll('.screen').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const vid = btn.querySelector('video');
+      const img = btn.querySelector('img');
+      lbVideo.hidden = !vid;
+      lbImg.hidden = !img;
+      if (img) {
+        lbImg.src = img.getAttribute('src');
+        lbImg.alt = img.alt;
+      }
+      try { lb.showModal(); } catch (e) { lb.setAttribute('open', ''); }
+      if (vid) {
+        lbVideo.src = vid.getAttribute('src');
+        lbVideo.currentTime = 0;
+        const p = lbVideo.play();
+        if (p && p.catch) p.catch(() => {});
+      }
+    });
+  });
+  function closeLb() {
+    lbVideo.pause();
+    lbVideo.removeAttribute('src');
+    lbVideo.load();
+    if (lb.open) lb.close();
+  }
+  document.getElementById('lb-close').addEventListener('click', closeLb);
+  lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+  lb.addEventListener('cancel', e => { e.preventDefault(); closeLb(); });
+</script>
+
+</body>
+</html>
